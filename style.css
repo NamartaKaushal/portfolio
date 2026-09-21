@@ -227,6 +227,9 @@ body {
     inset: 0;
     background: #fff;
 }
+@supports not ((clip-path: circle()) or (-webkit-clip-path: circle())) {
+    .portal-field { display: none !important; }
+}
 
 .portal-art {
     position: absolute;

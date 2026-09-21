@@ -252,6 +252,7 @@
         // Once the camera is inside the hole the screen holds no ink at all, so hide the white field
         // completely. (The About page then fades in on plain black.)
         field.style.clipPath = 'url(#' + clipId + ')';
+        field.style.webkitClipPath = 'url(#' + clipId + ')';
         field.style.visibility = t >= 1 ? 'hidden' : 'visible';
 
         section.style.setProperty('--gp-caption', (1 - smooth(0.01, 0.2, p)).toFixed(4));
