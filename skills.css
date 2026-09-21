@@ -276,3 +276,31 @@
     .skill-card h3 { font-size: 1.2rem; }
     .skill-card li { font-size: 1rem; }
 }
+
+@media (max-width: 860px) {
+    .skills {
+        --lamp-w: min(11rem, 62vw);
+        --line-y: 5rem;
+    }
+    .lamp-cones {
+        height: 11rem;
+    }
+    .lamp-cones::before {
+        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 22vw, #000 calc(50% - 3px), transparent calc(50% + 3px));
+                mask-image: linear-gradient(to right, transparent 0, #000 22vw, #000 calc(50% - 3px), transparent calc(50% + 3px));
+    }
+    .lamp-cones::after {
+        -webkit-mask-image: linear-gradient(to left, transparent 0, #000 22vw, #000 calc(50% - 3px), transparent calc(50% + 3px));
+                mask-image: linear-gradient(to left, transparent 0, #000 22vw, #000 calc(50% - 3px), transparent calc(50% + 3px));
+    }
+    .lamp-glow {
+        width: min(18rem, 82vw);
+        height: 8rem;
+        filter: blur(28px);   /* was 64px — too big for this small a glow, it was smearing the taper away */
+    }
+    .lamp-core {
+        width: 9rem;
+        height: 8rem;
+        filter: blur(20px);   /* was 40px, same reasoning */
+    }
+}

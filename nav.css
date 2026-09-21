@@ -159,7 +159,15 @@
     .nav-link[aria-current="true"] {
         background: var(--nav-accent);
         color: var(--nav-ink);
-    }    
+    }
+
+    /* bigger, easier-to-tap rows in the dropdown */
+    .nav-link {
+        padding: 0.9rem 1.4rem;
+        font-size: 1rem;
+        letter-spacing: 0.04em;
+    }
+      
 }
 
 .site-nav.is-open .nav-toggle-bar:nth-child(1) { transform: translateY(6px) rotate(45deg); }
