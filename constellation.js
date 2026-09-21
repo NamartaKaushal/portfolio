@@ -18,14 +18,13 @@ let height = 0;
 let animationFrameId;
 let lastTime = performance.now();
 
-// Check dark mode
-const isDarkMode = 
-    window.matchMedia('(prefers-color-scheme: dark)').matches;
+// This site is always dark-themed, regardless of the browser/OS colour scheme setting.
+const isDarkMode = true;
 
 // Colors
-const bgColor     = isDarkMode ? '#030407' : '#f8fafc';
-const nodeColor   = isDarkMode ? '255,255,255' : '15,23,42';
-const accentColor = isDarkMode ? '56,189,248' : '2,132,199';
+const bgColor     = '#030407';
+const nodeColor   = '255,255,255';
+const accentColor = '56,189,248';
 
 // Setup canvas size
 function handleResize() {
