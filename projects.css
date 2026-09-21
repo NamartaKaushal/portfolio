@@ -1,0 +1,200 @@
+/* projects.css
+   "Projects" section: one card per project (picture, title, description, tools, GitHub link).
+   Plain-CSS version of the "Project Card" component (hover: card lifts, picture zooms, arrow slides).
+
+   Quick tweaks:
+     --accent           the green of the tool chips, the link and the hover glow
+     .projects-grid     "repeat(2, ...)" = how many cards sit side by side
+*/
+
+.projects {
+    --accent: #4ade80;
+    --muted: rgb(251 251 250 / 0.6);
+
+    position: relative;
+    z-index: 10;
+    isolation: isolate;
+    padding: clamp(1rem, 3vw, 2rem) clamp(32px, 7vw, 100px) clamp(4rem, 10vw, 7rem);
+    color: #fbfbfa;
+    background: #030407;             /* plain black, same as the other pages */
+    font-family: ui-monospace, Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace;
+}
+
+.projects *,
+.projects *::before,
+.projects *::after { box-sizing: border-box; }
+:where(.projects) :where(h2, h3, p, ul) { margin: 0; padding: 0; }
+
+.projects-inner {
+    width: min(100%, 68rem);         /* same width as About and Experience */
+    margin: 0 auto;
+}
+
+/* Same font as the "SKILL SET" and "EXPERIENCE" headings */
+.projects-title {
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+.projects-grid {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1.25rem, 3vw, 2rem);
+    margin: clamp(2rem, 5vw, 3.5rem) 0 0;
+    padding: 0;
+}
+
+/* =====================================================
+   The card
+   ===================================================== */
+.project-card {
+    position: relative;               /* the link stretches over the whole card */
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgb(74 222 128 / 0.22);
+    border-radius: 1rem;
+    background: linear-gradient(180deg, rgb(74 222 128 / 0.06), rgb(3 4 7 / 0.8) 55%);
+    cursor: pointer;
+    transition: transform 0.5s ease-in-out, box-shadow 0.5s ease-in-out, border-color 0.5s ease-in-out;
+}
+.project-card:hover,
+.project-card:focus-within {
+    transform: translateY(-0.5rem);
+    border-color: rgb(74 222 128 / 0.55);
+    box-shadow: 0 20px 50px rgb(34 197 94 / 0.16);
+}
+
+/* ---------- the picture ---------- */
+.project-media {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    background:
+        radial-gradient(80% 90% at 50% 0%, rgb(74 222 128 / 0.14), transparent 70%),
+        #05070b;
+}
+/* Works for a drawing (svg) and for a real screenshot (img) alike */
+.project-media > svg,
+.project-media > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s ease-in-out;
+}
+.project-card:hover .project-media > svg,
+.project-card:hover .project-media > img,
+.project-card:focus-within .project-media > svg,
+.project-card:focus-within .project-media > img { transform: scale(1.1); }
+
+/* ---------- the text ---------- */
+.project-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: clamp(1.25rem, 2.4vw, 1.75rem);
+}
+
+.project-body h3 {
+    font-size: clamp(1.15rem, 1rem + 0.6vw, 1.5rem);
+    font-weight: 700;
+    line-height: 1.25;
+    color: #fff;
+    transition: color 0.3s ease;
+}
+.project-card:hover h3,
+.project-card:focus-within h3 { color: var(--accent); }
+
+.project-desc {
+    margin-top: 0.85rem;
+    font-size: clamp(0.9rem, 0.85rem + 0.2vw, 1rem);
+    line-height: 1.7;
+    color: var(--muted);
+}
+
+.project-label {
+    margin-top: auto;                 /* pushes the tools and the link to the bottom, so both cards line up */
+    padding-top: 1.4rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgb(251 251 250 / 0.45);
+}
+
+.project-tools {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.6rem;
+}
+.project-tools li {
+    padding: 0.3rem 0.65rem;
+    border: 1px solid rgb(74 222 128 / 0.28);
+    border-radius: 999px;
+    background: rgb(74 222 128 / 0.06);
+    font-size: 0.78rem;
+    line-height: 1.35;
+    color: rgb(251 251 250 / 0.88);
+}
+
+/* ---------- the link ---------- */
+.project-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: flex-start;
+    margin-top: 1.4rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+}
+.project-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+/* invisible layer that makes the whole card clickable */
+.project-link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+}
+.project-link:focus-visible { outline: none; }
+.project-card:has(.project-link:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.project-arrow {
+    width: 1rem;
+    height: 1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: transform 0.3s ease;
+}
+.project-card:hover .project-arrow,
+.project-card:focus-within .project-arrow { transform: translateX(0.25rem); }
+
+/* ---------- Narrow screens: one card per row ---------- */
+@media (max-width: 860px) {
+    .projects-grid { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .project-card,
+    .project-media > svg,
+    .project-media > img,
+    .project-arrow { transition: none; }
+    .project-card:hover,
+    .project-card:focus-within { transform: none; }
+    .project-card:hover .project-media > svg,
+    .project-card:hover .project-media > img,
+    .project-card:focus-within .project-media > svg,
+    .project-card:focus-within .project-media > img { transform: none; }
+}

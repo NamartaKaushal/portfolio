@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="skills.css">
+    <link rel="stylesheet" href="experience.css">
+    <link rel="stylesheet" href="projects.css">
+    <link rel="stylesheet" href="nav.css">
+    <link rel="stylesheet" href="contact.css">
+</head>
+<body>
+
+    <!-- Background canvas (constellation grid) -->
+    <canvas id="constellation"></canvas>
+
+    <!-- Navigation bar (fixed at the top). To rename a tab, change its text. To add one, copy a <li> and point href at a section id. -->
+    <nav class="site-nav" aria-label="Main navigation">
+        <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="main-nav-pill" aria-label="Open navigation menu">
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+        <span class="nav-toggle-bar"></span>
+    </button>
+        <ul class="nav-pill" id="main-nav-pill">
+            <li><a class="nav-link" href="#portal">Home (NK)</a></li>
+            <li><a class="nav-link" href="#about">About</a></li>
+            <li><a class="nav-link" href="#skills">Skills</a></li>
+            <li><a class="nav-link" href="#experience">Experience</a></li>
+            <li><a class="nav-link" href="#projects">Projects</a></li>
+            <li class="nav-cursor" aria-hidden="true"></li>
+        </ul>
+    </nav>
+
+    <main class="portal" id="portal">
+        <!-- Invisible probe: always 100svh tall, so mobile browser bars don't change the scroll distance -->
+        <div class="portal-viewport" data-viewport aria-hidden="true"></div>
+
+        <!-- Sticky stage: stays on screen while you scroll through the zoom -->
+        <div class="portal-pin" data-pin>
+
+            <div class="hero">
+                <!-- LEFT: your photo as dither art -->
+                <figure class="portrait">
+                    <canvas id="ascii-photo" role="img" aria-label="Portrait of Namarta Kaushal in green pixel-art style"></canvas>
+                    <figcaption class="portrait-note" id="ascii-note" hidden></figcaption>
+                </figure>
+
+                <!-- RIGHT: your name. portal.js draws these two lines as zoomable SVG letters -->
+                <div class="intro">
+                    <p class="hi">Hi, I'm</p>
+
+                    <h1 class="name-slot" data-slot>
+                        <span class="name-line" data-line>Namarta</span>
+                        <span class="name-line" data-line>Kaushal</span>
+                    </h1>
+
+                    <p class="role">Data Scientist | Chemical Engineer</p>
+
+                    <div class="cta">
+                        <a class="enter" href="#about"><span data-text-roll>About me</span> <span aria-hidden="true">&#8600;</span></a>
+                        <span class="hint" aria-hidden="true">Scroll to step inside &#8595;</span>
+                    </div>
+
+                    <!-- Contact icons. They sit at the top right on a computer and under the button on a phone.
+                         To change a link, edit its href. To add another icon, copy a whole <li> and change the icon and the link. -->
+                    <div class="contact">
+                        <ul class="contact-pill" aria-label="Contact links">
+                            <li>
+                                <a class="contact-link" href="mailto:namarta2033@gmail.com" title="Email" aria-label="Send an email to Namarta">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="contact-link" href="https://github.com/namartakaushal" target="_blank" rel="noopener noreferrer" title="GitHub" aria-label="Namarta's GitHub profile (opens in a new tab)">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="contact-link" href="https://www.linkedin.com/in/namarta-kaushal-397187247/" target="_blank" rel="noopener noreferrer" title="LinkedIn" aria-label="Namarta's LinkedIn profile (opens in a new tab)">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Green field, clipped to the letters of the name (clip lives in the SVG below) -->
+            <div class="portal-glow" aria-hidden="true">
+                <div class="portal-field" data-field>
+                    <div class="portal-field-bg"></div>
+                </div>
+            </div>
+            <svg class="portal-art" data-art aria-hidden="true" focusable="false">
+                <defs>
+                    <clipPath id="portal-clip" clipPathUnits="userSpaceOnUse"></clipPath>
+                </defs>
+            </svg>
+        </div>
+
+        <!-- Revealed when the zoom finishes -->
+        <section class="about" id="about" tabindex="-1" aria-labelledby="about-title">
+            <div class="about-inner" data-roll-group>
+                <h2 id="about-title"><span data-text-roll="auto">About me</span></h2>
+
+                <!-- Three paragraphs, one after the other. They share one style, so they always match. -->
+                <div class="about-text">
+                    <p>
+                        I'm a B.Tech graduate, who is currently working with EXL as a Business Analyst.
+                        I have explored areas such as programming, data analytics, robotics and engineering applications.
+                    </p>
+                    <p>
+                        I enjoy learning through practical projects and exploring new technologies.
+                    </p>
+                    <p>
+                        When I'm not busy, you'll probably find me lost in a novel, watching a movie
+                        (genre doesn't really matter) or playing chess &mdash; even though my chess skills
+                        are still very much a work in progress.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- =====================  SKILL SET  ===================== -->
+    <section class="skills" id="skills" aria-labelledby="skills-title">
+
+        <!-- The green lamp (purely decorative) -->
+        <div class="lamp" aria-hidden="true">
+            <div class="lamp-cones"></div>
+            <div class="lamp-glow"></div>
+            <div class="lamp-under"><div class="lamp-core"></div></div>
+            <div class="lamp-line"></div>
+        </div>
+
+        <div class="skills-inner">
+            <h2 class="skills-title" id="skills-title">Skill set</h2>
+
+            <!-- To add a skill: copy one <li> inside a <ul>. To add a group: copy a whole <li class="skill-card">.
+                 The little triangle on each card is added automatically. -->
+            <ol class="skills-grid">
+                <li class="skill-card" style="--i:0">
+                    <h3>Languages</h3>
+                    <ul>
+                        <li>Python</li>
+                        <li>SQL</li>
+                    </ul>
+                </li>
+                <li class="skill-card" style="--i:1">
+                    <h3>Data Analytics</h3>
+                    <ul>
+                        <li>Power BI</li>
+                        <li>EDA &amp; Statistics</li>
+                    </ul>
+                </li>
+                <li class="skill-card" style="--i:2">
+                    <h3>Machine Learning</h3>
+                    <ul>
+                        <li>Supervised Learning</li>
+                        <li>Deep Learning</li>
+                    </ul>
+                </li>
+                <li class="skill-card" style="--i:3">
+                    <h3>Applied AI</h3>
+                    <ul>
+                        <li>Image Processing</li>
+                        <li>NLP &amp; Transformers</li>
+                        <li>Agentic AI</li>
+                    </ul>
+                </li>
+                <li class="skill-card" style="--i:4">
+                    <h3>Cloud Computing</h3>
+                    <ul>
+                        <li>AWS</li>
+                        <li>Microsoft Azure</li>
+                    </ul>
+                </li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- =====================  EXPERIENCE  ===================== -->
+    <section class="experience" id="experience" aria-labelledby="experience-title">
+        <div class="experience-inner">
+            <h2 class="experience-title" id="experience-title">Experience</h2>
+
+            <div class="exp-layout">
+                <!-- The company names (clickable). To add a company: copy one button here AND one <article> below,
+                     and make aria-controls / id / aria-labelledby match. -->
+                <div class="exp-tabs" role="tablist" aria-label="Companies" aria-orientation="vertical">
+                    <button class="exp-tab" role="tab" id="tab-exl" aria-controls="panel-exl" aria-selected="true">EXL</button>
+                    <button class="exp-tab" role="tab" id="tab-technip" aria-controls="panel-technip" aria-selected="false" tabindex="-1">Technip Energies</button>
+                </div>
+
+                <div class="exp-content">
+                    <!-- ---------- EXL ---------- -->
+                    <article class="exp-panel" role="tabpanel" id="panel-exl" aria-labelledby="tab-exl">
+                        <h3>Business Analyst @ <span class="exp-company">EXL</span></h3>
+                        <p class="exp-meta">July 2026 &ndash; Present</p>
+                        <ul class="exp-points">
+                            <li><strong>Data Analyst training</strong> (July 2026 &ndash; August 2026): basic training covering SQL, Power BI and Cloud Computing.</li>
+                            <li><strong>Specialized AI course</strong> (August 2026 &ndash; October 2026), following the Data Analyst training.</li>
+                        </ul>
+                    </article>
+
+                    <!-- ---------- Technip Energies ---------- -->
+                    <article class="exp-panel" role="tabpanel" id="panel-technip" aria-labelledby="tab-technip">
+                        <h3>Intern &ndash; Process Design @ <span class="exp-company">Technip Energies</span></h3>
+                        <p class="exp-meta">May 2025 &ndash; July 2025 &middot; Ahmedabad, Gujarat</p>
+                        <ul class="exp-points">
+                            <li>Conducted analytical research on gasification processes, compiling and validating process data to support engineering decisions and management discussions.</li>
+                            <li>Gained hands-on experience with HTRI software and worked on PFDs and P&amp;IDs, carrying out process and hydraulics calculations.</li>
+                        </ul>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================  PROJECTS  ===================== -->
+    <section class="projects" id="projects" aria-labelledby="projects-title">
+        <div class="projects-inner">
+            <h2 class="projects-title" id="projects-title">Projects</h2>
+
+            <!-- To add a project: copy a whole <li class="project-card"> and change the text and the link. -->
+            <ul class="projects-grid">
+
+                <!-- ---------- Paint Color Naming Analysis ---------- -->
+                <li class="project-card">
+                    <!-- Picture area. It holds a drawing for now. To use a real screenshot, delete the <svg>
+                         and put  <img src="paint.png" alt="Paint Color Naming Analysis dashboard">  here instead. -->
+                    <div class="project-media">
+                        <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                            <g>
+                                <rect x="24"  y="58" width="30" height="92"  rx="4" fill="#e8dcc8"/>
+                                <rect x="59"  y="36" width="30" height="114" rx="4" fill="#c9b79c"/>
+                                <rect x="94"  y="52" width="30" height="98"  rx="4" fill="#8fa38b"/>
+                                <rect x="129" y="24" width="30" height="126" rx="4" fill="#4f6b5c"/>
+                                <rect x="164" y="46" width="30" height="104" rx="4" fill="#2f4858"/>
+                                <rect x="199" y="30" width="30" height="120" rx="4" fill="#b5654a"/>
+                                <rect x="234" y="62" width="30" height="88"  rx="4" fill="#d9a5a0"/>
+                                <rect x="269" y="40" width="30" height="110" rx="4" fill="#6b4f64"/>
+                            </g>
+                            <rect x="24" y="156" width="275" height="2" rx="1" fill="rgb(251 251 250 / 0.18)"/>
+                        </svg>
+                    </div>
+                    <div class="project-body">
+                        <h3>Paint Color Naming Analysis</h3>
+                        <p class="project-desc">Analyzed 6,000+ paint colors across 4 brands to quantify how luxury and mass-market naming conventions differ; found luxury brands use vocabulary 2x rarer and reference real places 2.3x more often. Built a Power BI dashboard and a Markov-chain generator applying the findings to name new colors from user-uploaded photos.</p>
+                        <p class="project-label">Tools used</p>
+                        <ul class="project-tools" aria-label="Tools used">
+                            <li>Python (Pandas, wordfreq, ipywidgets)</li>
+                            <li>Excel</li>
+                            <li>Power BI</li>
+                        </ul>
+                        <a class="project-link" href="https://github.com/NamartaKaushal/paint-naming-analysis" target="_blank" rel="noopener noreferrer" aria-label="View Paint Color Naming Analysis on GitHub (opens in a new tab)">View on GitHub <svg class="project-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </li>
+
+                <!-- ---------- Air Quality Monitoring System ---------- -->
+                <li class="project-card">
+                    <div class="project-media">
+                        <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="aq-fill" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0" stop-color="#4ade80" stop-opacity="0.32"/>
+                                    <stop offset="1" stop-color="#4ade80" stop-opacity="0"/>
+                                </linearGradient>
+                            </defs>
+                            <g stroke="rgb(251 251 250 / 0.08)" stroke-width="1">
+                                <path d="M0 45H320M0 90H320M0 135H320"/>
+                                <path d="M53 0V180M107 0V180M160 0V180M213 0V180M267 0V180"/>
+                            </g>
+                            <path d="M0 122 C30 112 50 62 82 72 S132 132 162 102 S212 42 242 62 S292 92 320 52 V180 H0 Z" fill="url(#aq-fill)"/>
+                            <path d="M0 122 C30 112 50 62 82 72 S132 132 162 102 S212 42 242 62 S292 92 320 52" fill="none" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round" style="filter: drop-shadow(0 0 5px rgb(74 222 128 / 0.8))"/>
+                            <circle cx="242" cy="62" r="4" fill="#4ade80"/>
+                            <text x="16" y="24" font-family="monospace" font-size="11" letter-spacing="1.5" fill="rgb(251 251 250 / 0.5)">MQ135 &middot; DHT11</text>
+                        </svg>
+                    </div>
+                    <div class="project-body">
+                        <h3>Air Quality Monitoring System</h3>
+                        <p class="project-desc">Developed an ESP32-based IoT system integrating MQ135 and DHT11 sensors for real-time air quality, temperature and humidity monitoring. Implemented sensor data validation and cloud integration to enable a reliable dashboard, continuous monitoring and data analysis.</p>
+                        <p class="project-label">Tools used</p>
+                        <ul class="project-tools" aria-label="Tools used">
+                            <li>ESP8266 NodeMCU</li>
+                            <li>MQ135 Gas Sensor</li>
+                            <li>DHT11 Sensor</li>
+                            <li>Python (Flask)</li>
+                            <li>HTML/CSS/JavaScript</li>
+                            <li>SQLite</li>
+                            <li>Chart.js</li>
+                        </ul>
+                        <a class="project-link" href="https://github.com/NamartaKaushal/Air-Quality-Monitoring-System-" target="_blank" rel="noopener noreferrer" aria-label="View Air Quality Monitoring System on GitHub (opens in a new tab)">View on GitHub <svg class="project-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+    <script src="constellation.js"></script>
+    <script src="ascii-photo.js"></script>
+    <script src="portal.js"></script>
+    <script src="text-roll.js"></script>
+    <script src="skills.js"></script>
+    <script src="experience.js"></script>
+    <script src="nav.js"></script>
+</body>
+</html>

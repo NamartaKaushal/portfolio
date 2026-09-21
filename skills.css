@@ -1,0 +1,278 @@
+/* skills.css
+   "Skill set" section with a green lamp hanging above it.
+   The lamp is a plain-CSS version of the Aceternity "Lamp" effect (conic-gradient light cones,
+   blurred glows and a bright line). The original is React + Framer Motion, this one is not.
+
+   Quick tweaks (all in the first block below):
+     --lamp-500 / --lamp-400   the greens of the light
+     --lamp-w                  how wide the light spreads
+     --line-y                  how far down from the top of the section the lamp hangs
+*/
+
+.skills {
+    --lamp-500: #22c55e;              /* main green of the light */
+    --lamp-400: #4ade80;              /* brighter green: the lamp line and its core glow */
+    --lamp-w: min(30rem, 46vw);       /* width of each light cone, and of the lamp line */
+    --line-y: 7rem;                   /* distance from the top of the section to the lamp line */
+    --pad: clamp(1.25rem, 5vw, 4rem); /* space left and right of the section */
+
+    position: relative;
+    z-index: 10;
+    isolation: isolate;
+    overflow: hidden;                 /* fallback for very old browsers */
+    overflow-x: clip;                 /* never scroll sideways ...                    */
+    overflow-y: visible;              /* ... but let the glow spill upward, no hard edge */
+    padding: calc(var(--line-y) + 5rem) var(--pad) clamp(4rem, 10vw, 7rem);
+    color: #fbfbfa;
+    background: #030407; 
+    font-family: Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace;
+}
+
+/* Independent of whatever reset the rest of the site uses */
+.skills *,
+.skills *::before,
+.skills *::after { box-sizing: border-box; }
+:where(.skills) :where(h2, h3, p, ol, ul) { margin: 0; padding: 0; }   /* :where() = never overrides the rules below */
+
+/* =====================================================
+   The lamp
+   ===================================================== */
+.lamp {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: calc(var(--line-y) + 24rem);
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+/* The light: two cones (one leaning left, one leaning right) meeting in the middle.
+   The two halves cross-fade over 6px in the centre and are ADDED together (plus-lighter),
+   so the join is seamless at any screen size or zoom. */
+.lamp-cones {
+    position: absolute;
+    top: var(--line-y);
+    left: 50%;
+    width: calc(var(--lamp-w) * 2);
+    height: 17.5rem;
+    transform: translateX(-50%);
+    isolation: isolate;
+    opacity: 1;
+    transition: width 0.8s ease-in-out 0.3s, opacity 0.8s ease-in-out 0.3s;
+    /* fade out the bottom edge */
+    -webkit-mask-image: linear-gradient(to top, transparent 0, #000 12.5rem);
+            mask-image: linear-gradient(to top, transparent 0, #000 12.5rem);
+}
+.lamp-cones::before,
+.lamp-cones::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    mix-blend-mode: plus-lighter;
+}
+.lamp-cones::before {
+    background: conic-gradient(from 70deg at 25% 0, var(--lamp-500), transparent, transparent);
+    /* fade out the outer (left) edge, and cross-fade away around the middle */
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 10rem, #000 calc(50% - 3px), transparent calc(50% + 3px));
+            mask-image: linear-gradient(to right, transparent 0, #000 10rem, #000 calc(50% - 3px), transparent calc(50% + 3px));
+}
+.lamp-cones::after {
+    background: conic-gradient(from 290deg at 75% 0, transparent, transparent, var(--lamp-500));
+    /* mirror image of the left half */
+    -webkit-mask-image: linear-gradient(to left, transparent 0, #000 10rem, #000 calc(50% - 3px), transparent calc(50% + 3px));
+            mask-image: linear-gradient(to left, transparent 0, #000 10rem, #000 calc(50% - 3px), transparent calc(50% + 3px));
+}
+
+/* Big soft glow around the line. It is allowed to spill a little above it. */
+.lamp-glow {
+    position: absolute;
+    top: calc(var(--line-y) - 2.5rem);
+    left: 50%;
+    width: min(28rem, 90vw);
+    height: 11.25rem;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: var(--lamp-500);
+    opacity: 0.5;
+    filter: blur(64px);
+    z-index: 3;
+}
+
+/* Everything in here is cut off above the line, so the core glow only shines downward */
+.lamp-under {
+    position: absolute;
+    top: var(--line-y);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    z-index: 2;
+}
+.lamp-core {
+    position: absolute;
+    top: -4.4rem;
+    left: 50%;
+    width: 16rem;
+    height: 11.25rem;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    background: var(--lamp-400);
+    filter: blur(40px);
+    transition: width 0.8s ease-in-out 0.3s;
+}
+
+/* The lamp itself: a thin bright line */
+.lamp-line {
+    position: absolute;
+    top: var(--line-y);
+    left: 50%;
+    width: var(--lamp-w);
+    height: 2px;
+    margin-top: -1px;
+    transform: translateX(-50%);
+    background: var(--lamp-400);
+    box-shadow: 0 0 16px 1px rgb(74 222 128 / 0.6);
+    z-index: 4;
+    transition: width 0.8s ease-in-out 0.3s;
+}
+
+/* ---------- Before the section scrolls into view: light is small and dim ---------- */
+.skills-anim:not(.is-lit) .lamp-cones { width: var(--lamp-w); opacity: 0.5; }
+.skills-anim:not(.is-lit) .lamp-core { width: 8rem; }
+.skills-anim:not(.is-lit) .lamp-line { width: calc(var(--lamp-w) / 2); }
+
+/* =====================================================
+   Heading and skill cards
+   ===================================================== */
+.skills-inner {
+    position: relative;
+    z-index: 5;
+    width: min(100%, 84rem);
+    margin: 0 auto;
+}
+
+.skills-title {
+    padding-bottom: 0.12em;
+    text-align: center;
+    font-size: clamp(2.4rem, 7vw, 4.75rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #ffffff 0%, #bbf7d0 100%);
+    -webkit-background-clip: text;
+            background-clip: text;
+    -webkit-text-fill-color: transparent;
+            color: transparent;
+    transition: opacity 0.8s ease-in-out 0.3s, transform 0.8s ease-in-out 0.3s;
+}
+.skills-anim:not(.is-lit) .skills-title {
+    opacity: 0.5;
+    transform: translateY(100px);
+}
+
+.skills-grid {
+    list-style: none;
+    counter-reset: skill;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));   /* all five groups side by side */
+    gap: clamp(0.75rem, 1.4vw, 1.25rem);
+    margin-top: clamp(2.5rem, 6vw, 3.75rem);
+}
+
+.skill-card {
+    counter-increment: skill;
+    min-width: 0;
+    padding: clamp(1.1rem, 1.6vw, 1.6rem) clamp(1.1rem, 1.6vw, 1.6rem) clamp(1.25rem, 1.8vw, 1.75rem);
+    border: 1px solid rgb(74 222 128 / 0.22);
+    border-radius: 14px;
+    background: linear-gradient(180deg, rgb(74 222 128 / 0.07), rgb(3 4 7 / 0.72) 60%);
+    -webkit-backdrop-filter: blur(6px);
+            backdrop-filter: blur(6px);
+    transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.skill-card:hover {
+    transform: translateY(-3px);
+    border-color: rgb(74 222 128 / 0.55);
+    box-shadow: 0 12px 40px rgb(34 197 94 / 0.14);
+}
+
+/* 01, 02, 03 ... numbers come from a CSS counter, no need to type them */
+.skill-card::before {
+    content: ">";
+    display: block;
+    margin-bottom: 0.9rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--lamp-400);
+    text-shadow: 0 0 8px rgb(74 222 128 / 0.75);;
+}
+
+.skill-card h3 {
+    margin-bottom: 1.1rem;
+    font-size: clamp(0.95rem, 1.35vw, 1.3rem);
+    overflow-wrap: anywhere;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #fff;
+}
+
+.skill-card ul {
+    list-style: none;
+    display: grid;
+    gap: 0.65rem;
+}
+.skill-card li {
+    position: relative;
+    padding-left: 1.35rem;
+    font-size: clamp(0.82rem, 1.05vw, 1rem);
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+    color: rgb(251 251 250 / 0.88);
+}
+/* small glowing square bullets, echoing the pixels of the photo */
+.skill-card li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.5em;
+    width: 0.42rem;
+    height: 0.42rem;
+    background: var(--lamp-400);
+    box-shadow: 0 0 8px rgb(74 222 128 / 0.7);
+}
+
+.skills-grid:focus-visible { outline: 2px solid var(--lamp-400); outline-offset: 6px; border-radius: 6px; }
+
+/* Cards appear one after another once the lamp is on */
+.skills-anim:not(.is-lit) .skill-card { opacity: 0; }
+.skills-anim.is-lit .skill-card {
+    animation: skill-in 0.7s ease backwards;
+    animation-delay: calc(0.55s + var(--i, 0) * 0.09s);
+}
+@keyframes skill-in {
+    from { opacity: 0; transform: translateY(28px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Narrower screens: still one horizontal row, now a swipeable strip ---------- */
+@media (max-width: 1180px) {
+    .skills-grid {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-padding-inline: var(--pad);
+        margin-inline: calc(var(--pad) * -1);      /* strip runs edge to edge */
+        padding: 0.6rem var(--pad) 1.4rem;         /* room for the hover lift and the scrollbar */
+        scrollbar-width: thin;
+        scrollbar-color: rgb(74 222 128 / 0.5) transparent;
+    }
+    .skill-card {
+        flex: 0 0 min(17rem, 78vw);
+        scroll-snap-align: start;
+    }
+    .skill-card h3 { font-size: 1.2rem; }
+    .skill-card li { font-size: 1rem; }
+}

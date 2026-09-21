@@ -1,0 +1,384 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Smooth scrolling makes the "About me" button play the zoom instead of jumping */
+html { scroll-behavior: auto; }
+@media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+}
+
+/* NOTE: no overflow:hidden on body any more, the page has to scroll now */
+body {
+    background-color: #030407;
+    font-family: monospace;
+    color: white;
+}
+
+/* Constellation canvas fills the entire background */
+#constellation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    cursor: crosshair;
+}
+
+/* =====================================================
+   Scroll portal
+   ===================================================== */
+.portal {
+    --gp-length: 2.4;
+    --gp-height: 100vh;
+    --gp-height: 100svh;
+    --gp-caption: 1;          /* 1 -> 0 while the zoom starts (fades photo and text) */
+    --gp-reveal: 1;           /* 0 -> 1 as the About section appears */
+    --gp-field-scale: 1;
+    --gp-cta-events: auto;
+
+    position: relative;
+    z-index: 10;
+    isolation: isolate;
+    pointer-events: none;     /* the constellation keeps reacting to your mouse */
+}
+
+.portal-viewport {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100vh;
+    height: 100svh;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.portal-pin {
+    position: relative;
+    height: var(--gp-height);
+    overflow: hidden;
+    overflow: clip;
+    isolation: isolate;
+}
+/* Only pin the stage once the script has measured the letters */
+.portal[data-motion="on"] .portal-pin {
+    position: sticky;
+    top: 0;
+}
+
+/* ---------- Two columns: photo on the left, text on the right ---------- */
+.hero {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: clamp(32px, 6vw, 110px);
+    padding: 0 clamp(24px, 6vw, 110px);
+}
+
+.portrait {
+    position: relative;
+    top: 2rem; 
+    width: min(calc(78vh * 0.75), 570px, 46vw);
+    aspect-ratio: 3 / 4;
+    opacity: var(--gp-caption);
+    transform: translateX(calc((1 - var(--gp-caption)) * -56px));
+}
+
+.portrait canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    border-radius: 14px;
+    background: #000;
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.08),
+        0 24px 120px rgba(0, 255, 102, 0.14);
+}
+
+/* Message shown only if photo.jpg is missing or can't be read */
+.portrait-note {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    z-index: 1;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #bfffd8;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+/* ---------- Right column ---------- */
+.intro {
+    min-width: 0;
+}
+
+.hi {
+    font-size: clamp(22px, 3vw, 44px);
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 0.45em;
+    opacity: calc(0.7 * var(--gp-caption));
+}
+
+/* The slot reserves the space where the SVG name is drawn.
+   Its box is measured by portal.js and the name is fitted into it. */
+.name-slot {
+    position: relative;
+    width: min(100%, 820px);
+    aspect-ratio: 4.5 / 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    font-family: Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace;
+    font-weight: 900;
+    font-size: clamp(40px, 8vw, 128px);
+    text-transform: uppercase;
+    line-height: 1;
+}
+.name-line { display: block; }
+
+/* Once the SVG version is running, the text stays only for screen readers and search engines */
+.portal[data-ready] .name-line {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.role {
+    margin-top: 24px;
+    font-size: clamp(13px, 1.3vw, 18px);
+    opacity: calc(0.7 * var(--gp-caption));
+}
+
+.cta {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 22px;
+    opacity: var(--gp-caption);
+    pointer-events: var(--gp-cta-events);
+}
+
+.enter {
+    pointer-events: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 46px;
+    padding: 0 20px;
+    border: 1px solid #1fae7a;
+    border-radius: 10px;
+    background: #0f7a52;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.18s;
+}
+.enter:hover { background: #14895c; }
+.enter:focus-visible { outline: 2px solid #bfffd8; outline-offset: 4px; }
+
+.hint {
+    font-size: 12px;
+    opacity: 0.55;
+}
+
+/* ---------- The white field, visible only through the letters ---------- */
+/* No glow: the letters are plain white. */
+.portal-glow {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.portal-field {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+.portal[data-ready] .portal-field { opacity: 1; }
+
+.portal-field-bg {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+}
+
+.portal-art {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+}
+
+/* ---------- About section ---------- */
+.about {
+    position: relative;
+    z-index: 3;
+    min-height: var(--gp-height);
+    display: grid;
+    align-content: center;
+    padding: clamp(32px, 7vw, 100px);
+    color: #fbfbfa;
+    background: #030407;      /* plain black, same as the first page */
+    pointer-events: auto;
+}
+
+/* With the zoom running, the About page fades in over the black hole of the A */
+.portal[data-motion="on"] .about {
+    margin-top: calc((var(--gp-length) - 1) * var(--gp-height));
+    background: #030407;
+    opacity: var(--gp-reveal);
+    pointer-events: none;
+}
+.portal[data-motion="on"][data-entered="true"] .about { pointer-events: auto; }
+.portal[data-motion="on"] .about:focus-within { opacity: 1; pointer-events: auto; }
+.about:focus { outline: none; }
+
+.about-inner {
+    width: min(100%, 68rem);
+    margin: 0 auto;
+}
+
+.about h2 {
+    margin-bottom: clamp(20px, 4vh, 40px);
+    font: 900 clamp(2.2rem, 6vw, 3rem) / 1 "Arial Black", "Helvetica Neue", Arial, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+}
+
+/* =====================================================
+   About paragraphs: one after the other, all the same size and font
+   ===================================================== */
+.about-text {
+    display: grid;
+    gap: clamp(16px, 2.6vh, 28px);
+    max-width: 46rem;
+}
+
+.about-text p {
+    font-family: ui-monospace, Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace;
+    font-size: clamp(0.95rem, 0.8rem + 0.55vw, 1.2rem);
+    font-weight: 400;
+    line-height: 1.75;
+    color: #fbfbfa;
+}
+
+/* ---------- Phones and narrow windows: photo on top, text below ---------- */
+@media (max-width: 860px) {
+    .hero {
+        width: min(100%, 520px);
+        grid-template-columns: 1fr;
+        align-content: center;
+        justify-items: center;
+        row-gap: 18px;
+        padding: 0 20px;
+        text-align: center;
+    }
+
+    .portrait { width: min(calc(38vh * 0.75), 60vw); top: 0; }
+    .intro { width: 100%; }
+    .name-slot { margin: 0 auto; }
+    .cta { justify-content: center; }
+}
+
+/* ---------- Reduced motion: no zoom, just a normal page ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .portal-pin { position: relative !important; }
+    .about {
+        margin-top: 0 !important;
+        min-height: 0;
+        padding-block: 64px;
+        opacity: 1 !important;
+        background: #030407 !important;
+        pointer-events: auto !important;
+    }
+    .hint { display: none; }
+}
+/* =====================================================
+   Text roll (see text-roll.js)
+   ===================================================== */
+.text-roll { display: inline-block; }
+
+.tr-letters { display: inline; }
+
+/* a word never breaks in the middle, lines only wrap between words */
+.tr-word {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.tr-letter {
+    position: relative;
+    display: inline-block;
+    perspective: 10000px;
+    transform-style: preserve-3d;
+}
+
+.tr-out,
+.tr-in {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: inline-block;
+    backface-visibility: hidden;
+    transition-property: transform;
+    transition-timing-function: ease-in;
+    transition-duration: var(--tr-duration, 0.5s);
+}
+
+/* the letter you see at rest */
+.tr-out {
+    transform-origin: 50% 25%;
+    transform: rotateX(0deg);
+    transition-delay: calc(var(--tr-base, 0s) + var(--i) * var(--tr-stagger, 0.1s));
+}
+
+/* the copy that flips in on hover */
+.tr-in {
+    transform-origin: 50% 100%;
+    transform: rotateX(91deg);   /* a hair past 90 so no edge-on sliver shows */
+    transition-delay: calc(var(--tr-base, 0s) + var(--i) * var(--tr-stagger, 0.1s) + 0.2s);
+}
+
+.tr-size { visibility: hidden; }
+
+.text-roll.is-rolling .tr-out { transform: rotateX(91deg); }
+.text-roll.is-rolling .tr-in  { transform: rotateX(0deg); }
+
+/* text for screen readers only */
+.tr-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .tr-out, .tr-in { transition: none; }
+}

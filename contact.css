@@ -1,0 +1,83 @@
+/* contact.css
+   Contact icons (email, GitHub, LinkedIn) at the top right of the home page.
+   Same bar as the navigation (dark, blurred, same height, same distance from the top), but with no
+   sliding capsule: when you point at an icon, it simply glows green.
+
+   Quick tweaks:
+     --contact-accent     the green of the glow
+     .contact             where the bar sits (top, right)
+     .contact-link        size of the clickable area of each icon
+     .contact-link svg    size of the icon itself
+
+   The icons are from Lucide (https://lucide.dev), ISC licence.
+*/
+
+.contact {
+    --contact-accent: #4ade80;              /* same green as the rest of the site */
+
+    position: absolute;
+    top: clamp(0.6rem, 1.6vw, 1rem);        /* same height as the navigation bar */
+    right: clamp(24px, 6vw, 110px);         /* same distance from the edge as the nav has on the left */
+    z-index: 5;
+    opacity: var(--gp-caption, 1);          /* fades away with the rest of the home page while you scroll */
+    pointer-events: var(--gp-cta-events, auto);
+}
+
+/* The bar: copies the look of .nav-pill in nav.css */
+.contact-pill {
+    display: flex;
+    margin: 0;
+    padding: 0.25rem;
+    list-style: none;
+    background: rgb(3 4 7 / 0.72);
+    -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+}
+
+.contact-link {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;                          /* with the bar padding this makes the bar exactly as tall as the nav */
+    height: 2rem;
+    border-radius: 999px;
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.25s ease, filter 0.25s ease;
+}
+
+.contact-link svg {
+    width: 1.4rem;
+    height: 1.4rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Hover (or keyboard focus): the icon turns green and glows */
+.contact-link:hover,
+.contact-link:focus-visible {
+    color: var(--contact-accent);
+    filter:
+        drop-shadow(0 0 3px rgb(74 222 128 / 0.9))
+        drop-shadow(0 0 10px rgb(74 222 128 / 0.65));
+}
+.contact-link:focus-visible {
+    outline: 2px solid var(--contact-accent);
+    outline-offset: 2px;
+}
+
+/* ---------- Phones and narrow windows: the nav bar takes the whole top, so the icons move under the button ---------- */
+@media (max-width: 860px) {
+    .contact {
+        position: static;
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .contact-link { transition: none; }
+}

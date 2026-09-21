@@ -1,0 +1,180 @@
+/* experience.css
+   "Experience" section: company names on the left (clickable), details of the chosen company on the right.
+
+   Quick tweaks:
+     --accent           the green used for the active company, the company name and the bullets
+     .experience-title  the heading (font, size)
+     .exp-layout        first number = width of the company list
+*/
+
+.experience {
+    --accent: #4ade80;
+    --muted: rgb(251 251 250 / 0.55);
+
+    position: relative;
+    z-index: 10;
+    isolation: isolate;
+    padding: clamp(4rem, 9vw, 7rem) clamp(32px, 7vw, 100px) clamp(4rem, 10vw, 7rem);
+    color: #fbfbfa;
+    background: #030407;             /* plain black, same as the other pages */
+    font-family: ui-monospace, Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace;
+}
+
+.experience *,
+.experience *::before,
+.experience *::after { box-sizing: border-box; }
+:where(.experience) :where(h2, h3, p, ul) { margin: 0; padding: 0; }
+
+.experience-inner {
+    width: min(100%, 68rem);         /* same width as the About page, so the left edges line up */
+    margin: 0 auto;
+}
+
+/* Same font as the "SKILL SET" heading: bold, uppercase, tight letter spacing */
+.experience-title {
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: #fff;
+}
+
+/* =====================================================
+   Layout: company list | details
+   ===================================================== */
+.exp-layout {
+    display: grid;
+    grid-template-columns: minmax(9rem, 13rem) minmax(0, 1fr);
+    gap: clamp(1.5rem, 4vw, 3.5rem);
+    align-items: start;
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+}
+
+/* ---------- the company list ---------- */
+.exp-tabs {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgb(251 251 250 / 0.14);
+}
+
+.exp-tab {
+    position: relative;
+    appearance: none;
+    margin: 0;
+    padding: 1rem 1.25rem 1rem 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    font-family: inherit;
+    font-size: clamp(0.9rem, 0.85rem + 0.25vw, 1.05rem);
+    font-weight: 500;
+    line-height: 1.3;
+    color: rgb(251 251 250 / 0.72);
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+.exp-tab:hover { color: #fff; }
+.exp-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
+
+/* the bar next to the chosen company */
+.exp-tab::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: -1px;
+    width: 2px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 0.25s ease;
+}
+.exp-tab[aria-selected="true"] { color: var(--accent); }
+.exp-tab[aria-selected="true"]::after { transform: scaleY(1); }
+
+/* ---------- the details ---------- */
+.exp-panel[hidden] { display: none; }
+.exp-panel { animation: exp-in 0.45s ease both; }
+@keyframes exp-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.exp-panel h3 {
+    font-size: clamp(1.2rem, 1rem + 1.1vw, 1.9rem);
+    font-weight: 700;
+    line-height: 1.25;
+    color: #fff;
+}
+.exp-company { color: var(--accent); }
+
+.exp-meta {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.exp-points {
+    list-style: none;
+    display: grid;
+    gap: 1.15rem;
+    margin-top: clamp(1.4rem, 3vw, 2.2rem);
+}
+.exp-points li {
+    position: relative;
+    padding-left: 1.7rem;
+    font-size: clamp(0.95rem, 0.85rem + 0.4vw, 1.1rem);
+    line-height: 1.75;
+    color: rgb(251 251 250 / 0.8);
+}
+.exp-points strong { font-weight: 600; color: #fff; }
+
+/* small triangle bullet (pointing right), drawn with borders */
+.exp-points li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: calc(0.875em - 0.3rem);      /* centred on the first line of text */
+    width: 0;
+    height: 0;
+    border-top: 0.3rem solid transparent;
+    border-bottom: 0.3rem solid transparent;
+    border-left: 0.5rem solid var(--accent);
+}
+
+/* ---------- If the script does not run, show every company one under the other ---------- */
+.experience:not(.exp-js) .exp-tabs { display: none; }
+.experience:not(.exp-js) .exp-layout { grid-template-columns: 1fr; }
+.experience:not(.exp-js) .exp-panel + .exp-panel { margin-top: 3rem; }
+
+/* ---------- Narrow screens: company names go on top as a row ---------- */
+@media (max-width: 760px) {
+    .exp-layout { grid-template-columns: 1fr; }
+
+    .exp-tabs {
+        flex-direction: row;
+        gap: 1.5rem;
+        overflow-x: auto;
+        border-right: 0;
+        border-bottom: 1px solid rgb(251 251 250 / 0.14);
+        scrollbar-width: none;
+    }
+    .exp-tab { padding: 0.85rem 0; white-space: nowrap; }
+    .exp-tab::after {
+        top: auto;
+        left: 0;
+        right: 0;
+        bottom: -1px;
+        width: auto;
+        height: 2px;
+        transform: scaleX(0);
+    }
+    .exp-tab[aria-selected="true"]::after { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .exp-panel { animation: none; }
+    .exp-tab, .exp-tab::after { transition: none; }
+}
